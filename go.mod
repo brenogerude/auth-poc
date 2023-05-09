@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab
+	github.com/google/uuid v1.3.0
 )
 
 require (

@@ -11,10 +11,14 @@ type Body struct {
 	Reflection reflect.Value
 }
 
-func BuildBody[T interface{}](content T) Body {
+func BuildBody(content interface{}) Body {
+	b, err := json.MarshalIndent(&content, "", "\t")
+	if err != nil {
+		panic(err)
+	}
 	v := reflect.ValueOf(content)
 	return Body{
-		Content:    content,
+		Content:    b,
 		Reflection: v,
 	}
 }

@@ -15,9 +15,22 @@ type GetUserOutput struct {
 
 var homeRoutes = RouterGroup{
 	Get("/", GetHandler, AuthGuard(model.AdminRole, model.SupportRole)),
+	Get("/users/:id", GetUsersHandler, AuthGuard(model.AdminRole, model.SupportRole)),
 }
 
 func GetHandler(request *http.Request, response *Response) {
+	output := GetUserOutput{
+		Id:        "1",
+		FirstName: "Breno",
+		LastName:  "Gerude",
+		CompanyId: "1",
+		SSN:       "123",
+	}
+	body := BuildBody(output)
+	response.Success(body)
+}
+
+func GetUsersHandler(request *http.Request, response *Response) {
 	output := GetUserOutput{
 		Id:        "1",
 		FirstName: "Breno",
