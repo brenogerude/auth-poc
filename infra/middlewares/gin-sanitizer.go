@@ -2,22 +2,21 @@ package middleware
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Sanitizer interface {
-	Sanitize(*gin.Context, any) error
+	Sanitize(context *gin.Context, responseBody any) error
 }
 
-type responseWriter struct {
+type SanitizerResponseWriter struct {
 	gin.ResponseWriter
 	body any
 }
 
-func (w *responseWriter) Write(b []byte) (int, error) {
+func (w *SanitizerResponseWriter) Write(b []byte) (int, error) {
 	err := json.Unmarshal(b, &w.body)
 	if err != nil {
 		return 0, err
@@ -25,32 +24,28 @@ func (w *responseWriter) Write(b []byte) (int, error) {
 	return len(b), nil
 }
 
-func (w *responseWriter) Override() (int, error) {
-	bytes, err := json.Marshal(w.body)
+func (w *SanitizerResponseWriter) UpdateResponseBody() (int, error) {
+	bodyBytes, err := json.Marshal(w.body)
 	if err != nil {
 		return 0, err
 	}
-	return w.ResponseWriter.Write(bytes)
+	return w.ResponseWriter.Write(bodyBytes)
 }
 
-func Sanitization(sanitizers map[string]Sanitizer) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		writer := &responseWriter{c.Writer, nil}
-		c.Writer = writer
-		c.Next()
+func Sanitization(sanitizers ...Sanitizer) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		sanitizerResponseWriter := &SanitizerResponseWriter{context.Writer, nil}
+		context.Writer = sanitizerResponseWriter
+		context.Next()
 
-		// imagine we'll dynamically get the source from somewhere
-		source := "osv"
-		sanitizer, found := sanitizers[source]
-		if !found {
-			c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("Sanitizer %s not found!", source))
-			return
+		for _, sanitizer := range sanitizers {
+			err := sanitizer.Sanitize(context, sanitizerResponseWriter.body)
+			if err != nil {
+				context.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
 		}
-		err := sanitizer.Sanitize(c, writer.body)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		writer.Override()
+
+		sanitizerResponseWriter.UpdateResponseBody()
 	}
 }

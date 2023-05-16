@@ -9,13 +9,14 @@ type Inner struct {
 	CompanyId string `json:"companyId,omitempty"`
 }
 type GetUserOutput struct {
-	Id         string  `json:"id,omitempty"`
-	FirstName  string  `json:"firstName,omitempty"`
-	LastName   string  `json:"lastName,omitempty"`
-	CompanyId  string  `json:"companyId,omitempty"`
-	SSN        string  `json:"ssn,omitempty"`
-	Inner      Inner   `json:"inner,omitempty"`
-	InnerSlice []Inner `json:"inners,omitempty"`
+	Id          string  `json:"id,omitempty"`
+	FirstName   string  `json:"firstName,omitempty"`
+	LastName    string  `json:"lastName,omitempty"`
+	CompanyId   string  `json:"companyId,omitempty"`
+	SSN         string  `json:"ssn,omitempty"`
+	GrossAmount int64   `json:"gross,omitempty"`
+	Inner       Inner   `json:"inner,omitempty"`
+	InnerSlice  []Inner `json:"inners,omitempty"`
 }
 
 var homeRoutes = RouterGroup{
@@ -25,11 +26,12 @@ var homeRoutes = RouterGroup{
 
 func GetHandler(context *gin.Context) {
 	output := GetUserOutput{
-		Id:        "1",
-		FirstName: "Breno",
-		LastName:  "Gerude",
-		CompanyId: "1",
-		SSN:       "123",
+		Id:          "1",
+		FirstName:   "Breno",
+		LastName:    "Gerude",
+		CompanyId:   "1",
+		SSN:         "123",
+		GrossAmount: 15000,
 		Inner: Inner{
 			Id:        "2",
 			CompanyId: "2",
