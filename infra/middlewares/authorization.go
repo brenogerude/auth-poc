@@ -23,7 +23,7 @@ func authorization(header string, req *http.Request) (bool, error) {
 	}
 	//authorizeRole(session)
 
-	sessionOk, err := authrorizeSession(session, path)
+	sessionOk, err := authorizeSession(session, path)
 	if err != nil {
 		return false, err
 	}
@@ -38,11 +38,11 @@ func getToken(header string) string {
 	return tokenString
 }
 
-func authrorizeSession(session Session, path string) (bool, error) {
+func authorizeSession(session Session, path string) (bool, error) {
 	// /users/45s6df-4fs6d-5f4s/whatever...
 	//    ^         ^
 	//    |         |
-	pices, err := getPathPices(path)
+	pices, err := getPathPieces(path)
 	if err != nil {
 		return false, err
 	}
@@ -59,24 +59,24 @@ func authrorizeSession(session Session, path string) (bool, error) {
 	return authorizationsMethods[noun](session, subject)
 }
 
-func getPathPices(path string) ([]string, error) {
+func getPathPieces(path string) ([]string, error) {
 	if len(path) == 0 {
 		return nil, errors.New("empty path")
 	}
-	pices := strings.Split(path, "/")
-	return pices, nil
+	pieces := strings.Split(path, "/")
+	return []string{pieces[1], pieces[2]}, nil
 }
 
-func getPathSubject(pices []string) (string, error) {
-	if len(pices) <= 1 {
+func getPathSubject(pieces []string) (string, error) {
+	if len(pieces) <= 1 {
 		return "", errors.New("no route subject")
 	}
 
-	if !IsValidUUID(pices[1]) {
+	if !IsValidUUID(pieces[1]) {
 		return "", errors.New("invalid subject id")
 	}
 
-	return pices[1], nil
+	return pieces[1], nil
 }
 
 func IsValidUUID(u string) bool {

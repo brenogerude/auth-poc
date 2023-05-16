@@ -32,7 +32,7 @@ func (s Session) isSessionOwner(subject string) bool {
 }
 func (s Session) isConnectRelated(subject string) (bool, error) {
 	//check if session client and subject user are linked by a common connection
-	return false, nil
+	return true, nil
 }
 
 func (s Session) isBankAccountMemberOwner(subject string) bool {
